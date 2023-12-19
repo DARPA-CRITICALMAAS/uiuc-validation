@@ -1,0 +1,6 @@
+opencv-python
+rasterio
+matplotlib
+pandas
+numpy
+tqdm
