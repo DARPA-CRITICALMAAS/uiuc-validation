@@ -48,7 +48,7 @@ def main():
     if not os.path.exists(args.output) and not os.path.splitext(args.output)[1]:
         os.makedirs(args.output)
 
-    results_df = pd.DataFrame(columns = ['F1 Score', 'IoU Score'])
+    results_df = pd.DataFrame(columns = ['Feature Name','F1 Score', 'IoU Score'])
     pbar = tqdm(prediction_rasters)
     log.info(f'Starting grading of {len(prediction_rasters)} files from {args.prediction}')
     for file in pbar:
@@ -84,11 +84,11 @@ def main():
             base_img = np.zeros_like(true_img)
 
         result = gradeRasterPrediction(img, true_img, base_img)
-        results_df.loc[len(results_df)] = {'F1 Score' : result[0], 'IoU Score' : result[1]}
+        results_df.loc[len(results_df)] = {'Feature Name' : featurename, 'F1 Score' : result[0], 'IoU Score' : result[1]}
         
         if result[2] is not None:
             log.info(f'Saving graded image for {featurename}')
-            cv2.imwrite(os.path.join(args.output, featurename + '.tif'))
+            cv2.imwrite(os.path.join(args.output, featurename + '.tif'), result[2])
         log.info(f'Results for "{featurename}" | F1 : {result[0]}, IOU Score : {result[1]}')
 
     csv_path = os.path.join(args.output, os.path.basename(os.path.splitext(args.prediction)[0]) + '_results.csv')
