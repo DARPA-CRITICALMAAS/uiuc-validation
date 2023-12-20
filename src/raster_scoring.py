@@ -25,4 +25,4 @@ def gradeRasterPrediction(img, truth_img, debug_img=None):
     f1_score = 2 * ((precision * recall)/(precision+recall))
     iou_score = true_positive / np.count_nonzero(union)
 
-    return (f1_score, iou_score, debug_img)
+    return (f1_score, iou_score, recall, precision, debug_img)
