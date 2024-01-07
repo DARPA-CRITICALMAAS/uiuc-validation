@@ -2,7 +2,7 @@ import numpy as np
 
 # Plot effects
 CORRECT_COLOR = (64,255,64) # Green
-FAIL_COLOR = (0,0,255) # Red
+FAIL_COLOR = (255,0,0) # Red
 MISS_COLOR = (255,0,255) # Fuchsia
 
 def gradeRaster(image, truth_image, debug_image=None):
