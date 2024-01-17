@@ -1,12 +1,12 @@
 # Validation
 
-This is the internal UIUC repo for generating debugging and statistics on the performance of model outputs.
+This is the UIUC repo for generating debugging and statistics on the performance of model outputs.
 
 ## Installation
-To get started with this repo you will need to clone the repository and and install [requirements.txt](https://git.ncsa.illinois.edu/criticalmaas/pipeline/-/blob/abode_pipeline/requirements.txt). We recommend using python venv here to keep the working environment clean.
+To get started with this repo you will need to clone the repository and and install [requirements.txt](requirements.txt). We recommend using python venv here to keep the working environment clean.
 
 ```
-git clone git@git.ncsa.illinois.edu:criticalmaas/ta1-validation.git
+git clone git@github.com:DARPA-CRITICALMAAS/uiuc-validation.git
 cd validation
 python3 -m venv venv
 source ./venv/bin/activate
