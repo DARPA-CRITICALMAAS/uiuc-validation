@@ -12,30 +12,54 @@ import src.io as io
 import src.utils as utils
 from src.grading import gradeRaster
 
+LOGGER_NAME = 'DARPA_CMAAS_VALIDATION'
+FILE_LOG_LEVEL = logging.DEBUG
+STREAM_LOG_LEVEL = logging.INFO
+
 def parse_command_line():
     parser = argparse.ArgumentParser(description='')
-    parser.add_argument('-p','--prediction',
+    required_args = parser.add_argument_group('required arguments', '')
+    required_args.add_argument('-p','--prediction',
                         required=True,
                         help='The location of the predicted rasters to grade')
-    parser.add_argument('-t','--truth',
+    required_args.add_argument('-t','--truth',
                         required=True,
                         help='The location of the true segmentations to grade against')
-    parser.add_argument('-b','--baseimage',
+    
+    # Optional Arguments
+    optional_args = parser.add_argument_group('optional arguments', '')
+    optional_args.add_argument('-o', '--output',
+                        default='validation_results',
+                        help='Directory to write the validation feedback to. Defaults to "validation_results"')
+    optional_args.add_argument('-b','--baseimage',
                         default=None,
                         help='The location of the base color map images')
-    parser.add_argument('-o', '--output',
-                        default='./',
-                        help='The location to write to')
-    parser.add_argument('--denoise',
+    optional_args.add_argument('-l', '--log',
+                        default='logs/Latest.log',
+                        help='Option to set the file logging will output to. Defaults to "logs/Latest.log"')
+    # Flags
+    flag_group = parser.add_argument_group('Flags', '')
+    flag_group.add_argument('-h', '--help',
+                        action='help', 
+                        help='show this message and exit')
+    flag_group.add_argument('-v', '--verbose',
                         action='store_true',
-                        help='Flag to enable denoiseing step before grading images.')
+                        help='Flag to change the logging level from INFO to DEBUG')
+    # flag_group.add_argument('--denoise',
+    #                     action='store_true',
+    #                     help='Flag to enable denoiseing step before grading images.')
     return parser.parse_args()
 
 def main():
     args = parse_command_line()
 
     # Start logger
-    log = utils.start_logger('DARPA_CMAAS_VALIDATION','logs/validationDemo.log', log_level=logging.DEBUG, console_log_level=logging.INFO, writemode='w')
+    if args.verbose:
+        global FILE_LOG_LEVEL, STREAM_LOG_LEVEL
+        FILE_LOG_LEVEL = logging.DEBUG
+        STREAM_LOG_LEVEL = logging.DEBUG
+    global log
+    log = utils.start_logger(LOGGER_NAME, args.log, log_level=FILE_LOG_LEVEL, console_log_level=STREAM_LOG_LEVEL)
 
     # Get list of filepaths if directory
     if os.path.isdir(args.prediction):
@@ -79,8 +103,8 @@ def main():
                 base_img = None
         
             # Remove "noise" from image by removing pixel groups below a threshold
-            if args.denoise:
-                img = sieve(img, 10, connectivity=4)
+            #if args.denoise:
+            #    img = sieve(img, 10, connectivity=4)
             
             if args.baseimage is None and args.output != './':
                 base_img = np.zeros((*img.shape[:2],3), dtype=np.uint8)
