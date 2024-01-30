@@ -1,4 +1,6 @@
 rasterio
+cv2
 pandas
 numpy
 tqdm
+joblib
