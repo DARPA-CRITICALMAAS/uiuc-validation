@@ -5,7 +5,6 @@ from tqdm import tqdm
 import numpy as np
 import pandas as pd
 from tqdm.contrib.logging import logging_redirect_tqdm
-from matplotlib import pyplot as plt
 
 #from rasterio.features import sieve 
 
