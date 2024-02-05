@@ -8,8 +8,8 @@ from .utils import boundingBox
 
 # Plot effects
 CORRECT_COLOR = (64,255,64) # Green
-FAIL_COLOR = (255,0,0) # Red
-MISS_COLOR = (255,0,255) # Fuchsia
+FAIL_COLOR = (255,1,1) # Red
+MISS_COLOR = (255,1,255) # Fuchsia
 
 #def grade_pt_raster(image, true_image):
 
@@ -61,19 +61,19 @@ def usgs_grade_pt_raster(pred_image, true_image, feedback_image=None):
         used_pts = set()
         # Correct pts
         for p in matched_pt_pairs:
-            feedback_image = cv2.circle(feedback_image, p[0][0], pt_radius, CORRECT_COLOR, thickness)
+            feedback_image = cv2.circle(feedback_image, (p[0][0][1],p[0][0][0]), pt_radius, CORRECT_COLOR, thickness)
             used_pts.add(p[0][0])
             used_pts.add(p[0][1])
         # Missing pts
         for x, y, _ in np.argwhere(true_image==1):
             if (x,y) in used_pts:
                 continue
-            feedback_image = cv2.circle(feedback_image, (x,y), pt_radius, MISS_COLOR, thickness)
+            feedback_image = cv2.circle(feedback_image, (y,x), pt_radius, MISS_COLOR, thickness)
         # Unmatched pts
         for x, y, _ in np.argwhere(pred_image==1):
             if (x,y) in used_pts:
                 continue
-            feedback_image = cv2.circle(feedback_image, (x,y), pt_radius, FAIL_COLOR, thickness)
+            feedback_image = cv2.circle(feedback_image, (y,x), pt_radius, FAIL_COLOR, thickness)
 
     # Calculate statistical values
     sum_of_similarities=sum([1-item[1] for item in matched_pt_pairs])
@@ -102,7 +102,7 @@ def match_nearest_points(true_image, pred_image, min_valid_range=10, parallel_wo
     for x, y, _ in np.argwhere(intersection==1):
         lowest_dist_pairs.append((((x, y), (x, y)), 0.0)) 
         true_points_done.add((x, y))
-        pred_points_done.add((y, x))
+        pred_points_done.add((x, y))
     
     diagonal_length=math.sqrt(math.pow(true_image.shape[0], 2)+ math.pow(true_image.shape[1], 2))
     min_valid_range=int((min_valid_range*diagonal_length)/100) # in pixels
@@ -111,8 +111,8 @@ def match_nearest_points(true_image, pred_image, min_valid_range=10, parallel_wo
         result=[]
         # find all the points in pred withing min_valid_range rectangle
         mat_pred_inrange=pred_image[
-         max(x-min_valid_range, 0): min(x+min_valid_range, true_image.shape[1]),
-            max(y-min_valid_range, 0): min(y+min_valid_range, true_image.shape[0])
+         max(x-min_valid_range, 0): min(x+min_valid_range, true_image.shape[0]),
+            max(y-min_valid_range, 0): min(y+min_valid_range, true_image.shape[1])
         ]
         for x_pred_shift, y_pred_shift, _ in np.argwhere(mat_pred_inrange==1):
             y_pred=max(y-min_valid_range, 0)+y_pred_shift
