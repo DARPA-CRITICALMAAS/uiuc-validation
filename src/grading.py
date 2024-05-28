@@ -26,10 +26,17 @@ def grade_poly_raster(pred_image, true_image, feedback_image=None):
         return (0, 0, 0, 0, feedback_image)
 
     if feedback_image is not None:
-        feedback_image[(true_image>=1).all(-1)] = MISS_COLOR
-        feedback_image[(pred_image>=1).all(-1)] = FAIL_COLOR
-        feedback_image[(intersection==1).all(-1)] = CORRECT_COLOR
+        feedback_image[0][(true_image>=1)[0]] = MISS_COLOR[0]
+        feedback_image[1][(true_image>=1)[0]] = MISS_COLOR[1]
+        feedback_image[2][(true_image>=1)[0]] = MISS_COLOR[2]
+        feedback_image[0][(pred_image>=1)[0]] = FAIL_COLOR[0]
+        feedback_image[1][(pred_image>=1)[0]] = FAIL_COLOR[1]
+        feedback_image[2][(pred_image>=1)[0]] = FAIL_COLOR[2]
+        feedback_image[0][(intersection==1)[0]] = CORRECT_COLOR[0]
+        feedback_image[1][(intersection==1)[0]] = CORRECT_COLOR[1]
+        feedback_image[2][(intersection==1)[0]] = CORRECT_COLOR[2]
 
+        #raise Exception(f"feedback Dim {type((true_image>=1))}\n{(true_image>=1).shape}\n {type(feedback_image)} \n{feedback_image[0].shape}")
     recall = true_positive / np.count_nonzero(true_image)
     precision = true_positive / np.count_nonzero(pred_image)
     
