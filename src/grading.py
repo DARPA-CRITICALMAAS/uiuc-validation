@@ -6,13 +6,20 @@ from joblib import Parallel, delayed
 
 from .utils import boundingBox
 
+
+# pipeline manage
+from src.pipeline_manager import pipeline_manager
+
 # Plot effects
-CORRECT_COLOR = (64,255,64) # Green
-FAIL_COLOR = (255,1,1) # Red
-MISS_COLOR = (255,1,255) # Fuchsia
+# Define colors as numpy arrays for vectorized assignment
+CORRECT_COLOR = np.array([64, 255, 64], dtype=np.uint8)  # Green
+FAIL_COLOR = np.array([255, 1, 1], dtype=np.uint8)       # Red
+MISS_COLOR = np.array([255, 1, 255], dtype=np.uint8)     # Fuchsia
 
 #def grade_pt_raster(image, true_image):
 
+logging.basicConfig(filename='pipeline.log', level=logging.INFO, 
+                    format='%(asctime)s - %(levelname)s - %(message)s')
 log = logging.getLogger('DARPA_CMAAS_VALIDATION')
 
 def grade_poly_raster(pred_image, true_image, feedback_image=None):
@@ -25,10 +32,19 @@ def grade_poly_raster(pred_image, true_image, feedback_image=None):
     if true_positive == 0:
         return (0, 0, 0, 0, feedback_image)
 
+    # true_image, pred_image, intersection.shape : 1, 10513, 10561
+    # feedback_image.shape : 3, 10513, 10561
     if feedback_image is not None:
-        feedback_image[(true_image>=1).all(-1)] = MISS_COLOR
-        feedback_image[(pred_image>=1).all(-1)] = FAIL_COLOR
-        feedback_image[(intersection==1).all(-1)] = CORRECT_COLOR
+        # Expanding boolean masks to match feedback_image shape
+        true_mask_expanded = (true_image >= 1).astype(bool)
+        pred_mask_expanded = (pred_image >= 1).astype(bool)
+        intersection_mask_expanded = (intersection == 1).astype(bool)
+        
+        # Assigning colors to the feedback image using advanced indexing
+        feedback_image[:, true_mask_expanded[0]] = MISS_COLOR[:, None]
+        feedback_image[:, pred_mask_expanded[0]] = FAIL_COLOR[:, None]
+        feedback_image[:, intersection_mask_expanded[0]] = CORRECT_COLOR[:, None]
+
 
     recall = true_positive / np.count_nonzero(true_image)
     precision = true_positive / np.count_nonzero(pred_image)
