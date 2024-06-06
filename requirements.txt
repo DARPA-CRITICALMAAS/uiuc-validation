@@ -1,6 +1,23 @@
+numpy
+pandas
 rasterio
 opencv-python
-pandas
-numpy
-tqdm
+rich
+pytest
+matplotlib
+
+--extra-index-url https://test.pypi.org/simple/
+cmaas_utils>=0.1.9
+#cmaas_utils packages
+pydantic
+git+https://github.com/DARPA-CRITICALMAAS/cdr_schemas.git@v0.2.6+draft
+
+# USGS grading metric requirements
 joblib
+tqdm
+jupyter
+
+# For development testing
+pytest
+pytest-cov
+ruff

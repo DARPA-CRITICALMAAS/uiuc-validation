@@ -17,6 +17,14 @@ ANSI_CODES = {
     'reset' : "\x1b[0m",
 }
 
+class RichHandler(logging.Handler):
+    def __init__(self, progress):
+        super().__init__()
+        self.progress = progress
+
+    def emit(self, record):
+        self.progress.console.print(record.getMessage())
+
 class ColoredConsoleFormatter(logging.Formatter):
     LEVEL_COLORS = {
         logging.DEBUG: ANSI_CODES['cyan'],
@@ -76,6 +84,13 @@ def start_logger(logger_name, filepath, log_level=logging.INFO, console_log_leve
     log.setLevel(min(log_level,console_log_level))
 
     return log
+
+def swap_console_handler(log, handler):
+    orig_handler = log.handlers[1]
+    handler.setLevel(orig_handler.level)
+    handler.setFormatter(orig_handler.formatter)
+    log.handlers[1] = handler
+    return orig_handler
 
 def boundingBox(array):
     min_xy = [min(array, key=lambda x: (x[0]))[0], min(array, key=lambda x: (x[1]))[1]]
