@@ -4,23 +4,12 @@ import numpy as np
 import src.grading as grading
 import usgs_grading_metric as usgs_grading
 import cmaas_utils.io as io
+from tests.utilities import init_test_log
 
 legends_dir = 'tests/data/legends'
 maps_dir = 'tests/data/map_images'
 pred_segs_dir = 'tests/data/pred_segmentations'
 true_segs_dir = 'tests/data/true_segmentations'
-
-def init_test_log(name, level=logging.DEBUG, writemode='w'):
-    log_dir = os.path.join('tests/logs', os.path.dirname(name))
-    os.makedirs(log_dir, exist_ok=True)
-    log = logging.getLogger(name)
-    handler = logging.FileHandler(os.path.join(log_dir, f'{os.path.basename(name)}.log'), mode=writemode)
-    handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s - %(message)s', datefmt='%d/%m/%Y %H:%M:%S'))
-    handler.setLevel(level)
-    log.addHandler(handler)
-    log.setLevel(level)
-    log.info(f'Starting {name}')
-    return log
 
 class Test_grade_poly_raster:
     def run_test_grade_poly_raster(self, map_name, feature_name, log, map_dir=maps_dir, legend_dir=legends_dir, pred_seg_dir=pred_segs_dir, true_seg_dir=true_segs_dir):

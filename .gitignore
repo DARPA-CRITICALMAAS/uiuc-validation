@@ -10,11 +10,13 @@
 [Oo]utput
 [Rr]esults
 [Ll]ogs
+[Tt]ools
 tests/logs
 tests/uncommited_data
 __pycache__
 .pytest_cache
 .vscode
+.ruff_cache
 
 # virtual environments
 venv
