@@ -53,13 +53,13 @@ class Test_usgsDemo:
         self.run_test_usgsDemo(args, expected_csv_path, log)
         log.info('Test passed successfully')
 
-    # def test_MT_OldBaldy(self):
+    # def test_MT_OldBaldy_map(self):
     #     """
     #     Tests that usgsDemo produces the expected results.
     #     Data used for this test is the point features from MT_OldBaldyMountain_265833_1989_24000_geo_mosaic, which is from the final evaluation dataset.
     #     This test is commented out beacuse the test data is too large to be commited to the repository.
     #     """
-    #     log = init_test_log('Test_usgsDemo/test_MT_OldBaldy')
+    #     log = init_test_log('Test_usgsDemo/test_MT_OldBaldy_map')
     #     # args = '-p tests/uncommited_data/pred_segmentations/MT_OldBaldyMountain_265833_1989_24000_geo_mosaic* -t tests/uncommited_data/true_segmentations -m tests/uncommited_data/map_images/ -l tests/uncommited_data/legends'
     #     pred_seg_dir = 'tests/uncommited_data/pred_segmentations'
     #     args = SimpleNamespace(
@@ -76,13 +76,13 @@ class Test_usgsDemo:
     #     self.run_test_usgsDemo(args, expected_csv_path, log)
     #     log.info('Test passed successfully')
 
-    # def test_CA_Elsinore(self):
+    # def test_CA_Elsinore_map(self):
     #     """
     #     Tests that usgsDemo produces the expected results.
     #     Data used for this test is the point features from CA_Elsinore, which is from the validation dataset.
     #     This test is commented out beacuse the test data is too large to be commited to the repository.
     #     """
-    #     log = init_test_log('Test_usgsDemo/test_CA_Elsinore')
+    #     log = init_test_log('Test_usgsDemo/test_CA_Elsinore_map')
     #     # args = '-p tests/uncommited_data/pred_segmentations/CA_Elsinore* -t tests/uncommited_data/true_segmentations -m tests/uncommited_data/map_images/ -l tests/uncommited_data/legends'
     #     pred_seg_dir = 'tests/uncommited_data/pred_segmentations'
     #     args = SimpleNamespace(
