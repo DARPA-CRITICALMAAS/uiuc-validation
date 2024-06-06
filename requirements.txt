@@ -1,6 +1,14 @@
+numpy
+pandas
 rasterio
 opencv-python
-pandas
-numpy
-tqdm
+rich
+pytest
+matplotlib
+
+--extra-index-url https://test.pypi.org/simple/
+cmaas_utils>=0.1.9
+
+# USGS grading metric requirements
 joblib
+tqdm

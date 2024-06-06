@@ -1,0 +1,23 @@
+# File extensions to ignore
+*.pyc
+*.log
+*.old
+*.DS_Store
+
+# Directories to ignore
+#[Dd]ata
+[Oo]utput
+[Rr]esults
+[Ll]ogs
+tests/logs
+tests/uncommited_data
+*/__pycache__
+*/.pytest_cache
+*/.vscode
+
+# virtual environments
+venv
+
+
+
+
