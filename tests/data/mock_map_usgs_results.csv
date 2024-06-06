@@ -1,0 +1,5 @@
+,Map,Feature,F1 Score,Precision,Recall
+0,mock_map,mock_map_TZ_poly,0.905625,1.0,0.8275271273557966
+1,mock_map,mock_map_3_pt,0.848584707450122,0.7425116190188568,0.9900154920251424
+2,mock_map,mock_map_L_poly,0.957057127269893,0.9690656565656564,0.945342571208622
+3,mock_map,mock_map_2_pt,0.99,0.99,0.99
