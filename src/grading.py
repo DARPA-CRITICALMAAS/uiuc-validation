@@ -3,7 +3,6 @@ import cv2
 import numpy as np
 import math
 from joblib import Parallel, delayed
-from cmaas_utils.types import Legend
 
 from .utils import boundingBox
 

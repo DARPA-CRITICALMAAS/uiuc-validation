@@ -5,15 +5,16 @@
 *.DS_Store
 
 # Directories to ignore
-#[Dd]ata
+[Tt]estdata
+[Dd]ata
 [Oo]utput
 [Rr]esults
 [Ll]ogs
 tests/logs
 tests/uncommited_data
-*/__pycache__
-*/.pytest_cache
-*/.vscode
+__pycache__
+.pytest_cache
+.vscode
 
 # virtual environments
 venv

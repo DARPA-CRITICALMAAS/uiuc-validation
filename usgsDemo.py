@@ -26,7 +26,7 @@ def parse_command_line():
             if os.path.isfile(path) and path.endswith('.tif'):
                 data_files.append(path)
         if len(data_files) == 0:
-            msg = f'No valid files where given to --data argument. --data should be given a path or paths to file(s) \
+            msg = 'No valid files where given to --data argument. --data should be given a path or paths to file(s) \
                     and/or directory(s) containing the data to perform inference on. program will only run on .tif files'
             raise argparse.ArgumentTypeError(msg)
         return data_files

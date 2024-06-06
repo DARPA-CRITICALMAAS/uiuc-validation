@@ -16,3 +16,8 @@ git+https://github.com/DARPA-CRITICALMAAS/cdr_schemas.git@v0.2.6+draft
 joblib
 tqdm
 jupyter
+
+# For development testing
+pytest
+pytest-cov
+ruff

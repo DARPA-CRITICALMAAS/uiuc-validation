@@ -39,7 +39,7 @@ def parse_command_line():
             if os.path.isfile(path) and path.endswith('.tif'):
                 data_files.append(path)
         if len(data_files) == 0:
-            msg = f'No valid files where given to --data argument. --data should be given a path or paths to file(s) \
+            msg = 'No valid files where given to --data argument. --data should be given a path or paths to file(s) \
                     and/or directory(s) containing the data to perform inference on. program will only run on .tif files'
             raise argparse.ArgumentTypeError(msg)
         return data_files
@@ -96,7 +96,7 @@ def parse_command_line():
     optional_args.add_argument('-f','--feature_type',
                         type=parse_feature,
                         default=MapUnitType.POLYGON,
-                        help=f'Type of features that will be graded on, will be used if the feature type can\'t be \
+                        help='Type of features that will be graded on, will be used if the feature type can\'t be \
                                detected from the file name. Available features are Point or Polygon') 
     optional_args.add_argument('-o', '--output',
                         default='results',
@@ -167,7 +167,7 @@ def main():
         pred_image, _, _ = io.loadGeoTiff(pred_filepath)
         try:
             true_image, _, _ = io.loadGeoTiff(os.path.join(args.true_segmentations, os.path.basename(pred_filepath)))
-        except:
+        except FileNotFoundError:
             log.error(f'No true segementation map present for {feature_name}. Skipping')
             continue
 
