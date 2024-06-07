@@ -78,7 +78,7 @@ class Test_validationDemo:
     #         log='/dev/null',
     #         verbose=False,
     #         feedback=False)
-    #     expected_csv_path = 'tests/data/MT_OldBaldy_results.csv'
+    #     expected_csv_path = 'tests/uncommited_data/MT_OldBaldy_results.csv'
 
     #     self.run_test_validationDemo(args, expected_csv_path, log)
     #     log.info('Test passed successfully')
@@ -104,7 +104,8 @@ class Test_validationDemo:
     #         log='/dev/null',
     #         verbose=False,
     #         feedback=False)
-    #     expected_csv_path = 'tests/data/CA_Elsinore_results.csv'
+    #     expected_csv_path = 'tests/uncommited_data/CA_Elsinore_results.csv'
 
     #     self.run_test_validationDemo(args, expected_csv_path, log)
     #     log.info('Test passed successfully')
+

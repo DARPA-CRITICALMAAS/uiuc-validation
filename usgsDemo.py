@@ -1,7 +1,12 @@
 import os
+import logging
 import argparse
 import pandas as pd
 from usgs_grading_metric import feature_f_score
+from time import time
+from cmaas_utils.logging import start_logger
+
+LOGGER_NAME = 'USGS_VALIDATION_DEMO'
 
 def parse_command_line():
     """Runs Command line argument parser for pipeline. Exit program on bad arguments. Returns struct of arguments"""
@@ -88,6 +93,9 @@ def parse_command_line():
                         type=int,
                         default=4,
                         help='The range of color variation to consider for the legend color. Defaults to 4')
+    optional_args.add_argument('--log',
+                        default='logs/Latest.log',
+                        help='Option to set the file logging will output to. Defaults to "logs/Latest.log"')
     
     # Flags
     flag_group = parser.add_argument_group('Flags', '')
@@ -100,13 +108,18 @@ def parse_command_line():
     return args
 
 def main(args):
+    main_time = time()
+    global log
+    log = start_logger(LOGGER_NAME, args.log, log_level=logging.DEBUG, console_log_level=logging.INFO, writemode='w')
+
     # Create output directory if it does not exist
     if not os.path.exists(args.output):
         os.makedirs(args.output)
     
     results_df = pd.DataFrame(columns=['Map', 'Feature', 'F1 Score', 'Precision', 'Recall'])
 
-    print(f'Running USGS Grading Metric on {len(args.pred_segmentations)} files')
+    log.info(f'Running USGS Grading Metric on {len(args.pred_segmentations)} files')
+    skipped_files = []
     potential_map_names = [os.path.splitext(m)[0] for m in os.listdir(args.map_images) if m.endswith('.tif')]
     for pred_filepath in args.pred_segmentations:
         map_name = [m for m in potential_map_names if m in pred_filepath][0]
@@ -115,12 +128,20 @@ def main(args):
         true_filepath = os.path.join(args.true_segmentations, os.path.basename(pred_filepath))
         json_filepath = os.path.join(args.legends, map_name + '.json')
 
+        if not os.path.exists(true_filepath) or not os.path.exists(map_filepath) or not os.path.exists(json_filepath):
+            log.warning(f'Could not find the necessary files for {pred_filepath}, skipping grading')
+            skipped_files.append(pred_filepath)
+            continue
+
         result = feature_f_score(map_filepath, pred_filepath, true_filepath, legend_json_path=json_filepath, min_valid_range=args.min_valid_range, difficult_weight=args.difficult_weight, set_false_as=args.set_false_as, color_range=args.color_range)
         results_df.loc[len(results_df)] = {'Map' : map_name, 'Feature' : feature_name, 'F1 Score' : result['f_score'], 'Precision' : result['precision'], 'Recall' : result['recall']}
 
     csv_path = os.path.join(args.output, 'usgsDemo_results.csv')
-    print(f'Finished grading, saving results to {csv_path}')    
     results_df.to_csv(csv_path)
+    if len(skipped_files) > 0:
+        log.warning(f'Skipped grading on {len(skipped_files)} files. Could not find the necessary files for the following: {skipped_files}')
+    log.info(f'Finished grading, saving results to {csv_path}, Runtime was {time()-main_time} seconds')
+    
 
 if __name__ == '__main__':
     args = parse_command_line()

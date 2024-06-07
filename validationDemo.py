@@ -3,8 +3,8 @@ import logging
 import argparse
 import numpy as np
 import pandas as pd
+from time import time
 from rich.progress import track
-#from rasterio.features import sieve 
 
 import cmaas_utils.io as io
 from cmaas_utils.types import MapUnitType
@@ -94,11 +94,6 @@ def parse_command_line():
     optional_args.add_argument('-o', '--output',
                         default='results',
                         help='Directory to write the validation feedback to. Defaults to "results"')
-    # optional_args.add_argument('-f','--feature_type',
-    #                     type=parse_feature,
-    #                     default=MapUnitType.POLYGON,
-    #                     help='Type of features that will be graded on, will be used if the feature type can\'t be \
-    #                            detected from the file name. Available features are Point or Polygon') 
     optional_args.add_argument('--log',
                         default='logs/Latest.log',
                         help='Option to set the file logging will output to. Defaults to "logs/Latest.log"')
@@ -138,6 +133,7 @@ def parse_command_line():
     return args
 
 def main(args):
+    main_time = time()
     # Start logger
     if args.verbose:
         global FILE_LOG_LEVEL, STREAM_LOG_LEVEL
@@ -149,7 +145,6 @@ def main(args):
     # Log info statement to console even if in warning only mode
     log.handlers[1].setLevel(logging.INFO)
     log.info(f'Running pipeline on {os.uname()[1]} with following parameters:\n' +
-            # f'\tFeature type : {args.feature_type}\n' +
             f'\tPred Data    : {args.pred_segmentations}\n' +
             f'\tTrue Data    : {args.true_segmentations}\n' +
             f'\tMaps         : {args.map_images}\n' +
@@ -169,22 +164,22 @@ def main(args):
     log.info(f'Starting grading of {len(args.pred_segmentations)} files')
     last_map_filepath = None
     last_legend_filepath = None
+    skipped_files = []
     potential_map_names = [os.path.splitext(m)[0] for m in os.listdir(args.map_images) if m.endswith('.tif')]
     pbar = track(args.pred_segmentations)
     logging_handler = changeConsoleHandler(log, RichHandler(level=STREAM_LOG_LEVEL))
     for pred_filepath in pbar:
         feature_name = os.path.basename(os.path.splitext(pred_filepath)[0])
         feature_type = MapUnitType.from_str(feature_name.split('_')[-1])
-        # if feature_type == MapUnitType.UNKNOWN:
-        #     feature_type = args.feature_type
         log.info(f'Processing {feature_name}')
         
         # Load data
         pred_image, _, _ = io.loadGeoTiff(pred_filepath)
         try:
             true_image, _, _ = io.loadGeoTiff(os.path.join(args.true_segmentations, os.path.basename(pred_filepath)))
-        except FileNotFoundError:
+        except:
             log.error(f'No true segementation map present for {feature_name}. Skipping')
+            skipped_files.append(pred_filepath)
             continue
 
         map_name = [m for m in potential_map_names if m in pred_filepath][0]
@@ -211,7 +206,6 @@ def main(args):
             results['USGS Precision'] = results['Precision']
             results['USGS Recall'] = results['Recall']
 
-            #log.info(f'Results for {feature_name} : {results}')
             log.info(f'Results for "{feature_name}" : ' + 
                 f'F1 Score : {results["F1 Score"]:.2f}, ' + 
                 f'Precision : {results["Precision"]:.2f}, ' +
@@ -232,7 +226,6 @@ def main(args):
             results['USGS Precision'] = USGS_results['Precision']
             results['USGS Recall'] = USGS_results['Recall']
 
-            # log.info(f'Results for {feature_name} {results}')
             log.info(f'Results for "{feature_name}" : ' + 
                 f'F1 Score : {results["F1 Score"]:.2f}, ' + 
                 f'Precision : {results["Precision"]:.2f}, ' +
@@ -250,8 +243,11 @@ def main(args):
     changeConsoleHandler(log, logging_handler)
 
     csv_path = os.path.join(args.output, 'validationDemo_results.csv')
-    log.info(f'Finished grading, saving results to {csv_path}')    
     results_df.to_csv(csv_path)
+    if len(skipped_files) > 0:
+        log.warning(f'Skipped grading on {len(skipped_files)} files. Could not find the necessary files for the following: {skipped_files}')
+    log.info(f'Finished grading, saving results to {csv_path}, Runtime was {time()-main_time} seconds')    
+    
 
 if __name__=='__main__':
     args = parse_command_line()

@@ -46,6 +46,7 @@ class Test_usgsDemo:
             true_segmentations='tests/data/true_segmentations', 
             map_images='tests/data/map_images',
             legends='tests/data/legends',
+            log='/dev/null',
             min_valid_range=5,
             difficult_weight=0.7,
             set_false_as='hard',
@@ -69,11 +70,12 @@ class Test_usgsDemo:
     #         true_segmentations='tests/uncommited_data/true_segmentations', 
     #         map_images='tests/uncommited_data/map_images',
     #         legends='tests/uncommited_data/legends',
+    #         log='/dev/null',
     #         min_valid_range=0.1,
     #         difficult_weight=0.7,
     #         set_false_as='hard',
     #         color_range=4)
-    #     expected_csv_path = 'tests/data/MT_OldBaldy_results.csv'
+    #     expected_csv_path = 'tests/uncommited_data/MT_OldBaldy_results.csv'
 
     #     self.run_test_usgsDemo(args, expected_csv_path, log)
     #     log.info('Test passed successfully')
@@ -92,11 +94,12 @@ class Test_usgsDemo:
     #         true_segmentations='tests/uncommited_data/true_segmentations', 
     #         map_images='tests/uncommited_data/map_images',
     #         legends='tests/uncommited_data/legends',
+    #         log='/dev/null',
     #         min_valid_range=0.1,
     #         difficult_weight=0.7,
     #         set_false_as='hard',
     #         color_range=4)
-    #     expected_csv_path = 'tests/data/CA_Elsinore_results.csv'
+    #     expected_csv_path = 'tests/uncommited_data/CA_Elsinore_results.csv'
 
     #     self.run_test_usgsDemo(args, expected_csv_path, log)
     #     log.info('Test passed successfully')
