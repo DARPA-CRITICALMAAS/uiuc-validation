@@ -122,14 +122,15 @@ def main(args):
     skipped_files = []
     potential_map_names = [os.path.splitext(m)[0] for m in os.listdir(args.map_images) if m.endswith('.tif')]
     for pred_filepath in args.pred_segmentations:
-        map_name = [m for m in potential_map_names if m in pred_filepath][0]
+        map_name = [m for m in potential_map_names if m.replace(' ', '_') in pred_filepath][0]
         feature_name = os.path.basename(os.path.splitext(pred_filepath)[0])
         map_filepath = os.path.join(args.map_images, map_name + '.tif')
         true_filepath = os.path.join(args.true_segmentations, os.path.basename(pred_filepath))
         json_filepath = os.path.join(args.legends, map_name + '.json')
 
-        if not os.path.exists(true_filepath) or not os.path.exists(map_filepath) or not os.path.exists(json_filepath):
-            log.warning(f'Could not find the necessary files for {pred_filepath}, skipping grading')
+        missing_files = [label for label, f in {'true segmentation' : true_filepath, 'map image' : map_filepath, 'legend json' : json_filepath}.items() if not os.path.exists(f)] 
+        if len(missing_files) > 0:
+            log.warning(f'Could not find the necessary files for {os.path.basename(pred_filepath)}, missing {missing_files} skipping grading')
             skipped_files.append(pred_filepath)
             continue
 
