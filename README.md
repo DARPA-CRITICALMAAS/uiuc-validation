@@ -6,7 +6,7 @@ This repository contains the University of Illinois at Urbana-Champaign (UIUC) v
 <details>
 <summary> Installation </summary>
 
-To get started with this repo you will need to clone the repository and and install [requirements.txt](requirements.txt). We recommend using [**python>=3.10**](https://www.python.org/) and a virtual environment.
+To get started with this repo you will need to clone the repository and and install [requirements.txt](requirements.txt). We recommend using [python>=3.10](https://www.python.org/) and a virtual environment.
 
 ```
 git clone git@github.com:DARPA-CRITICALMAAS/uiuc-validation.git
@@ -24,8 +24,8 @@ pip install -r requirements.txt
 
 Included are two demo scripts that can perform generate validation metrics on a file(s) and/or directory(s). 
 
-* **usgsDemo.py** : Will run the orginal USGS grading algorithm on the provided data.
-* **validationDemo.py** Will generate a simple F1 score and the USGS F1 Score for the provided data. 
+* **usgsDemo.py** : Runs the original AI4CMAMetric USGS grading algorithm. This is the algorithm that was used to grade the AI4CMA Competition.
+* **validationDemo.py** : Generates a simple F1 score (equivalent to "difficult_weight" = None) and the USGS F1 Score.
 
 ```
 # Example call to validationDemo.py
@@ -36,9 +36,9 @@ python validationDemo.py --pred_segmentations <mydata>/predictions --true_segmen
 
 There are three provided python methods:
 
-* grade_point_raster : Grades a point raster against the true raster. Will provide the same score as the USGS metric.
-* grade_poly_raster : Grades a poly raster against the true raster. The score returned is equivlent to running USGS score with "difficult_weight" = None
-* usgs_grade_poly_raster : Grades a poly raster against the true raster. Runs an optimized version of the usgs grading metric for polygons. The score reurned is the same as the USGS metric.
+* **grade_point_raster** : Grades a point raster against the true raster. Will provide the same score as the USGS metric.
+* **grade_poly_raster** : Grades a poly raster against the true raster. The score returned is equivalent to running USGS score with "difficult_weight" = None
+* **usgs_grade_poly_raster** : Grades a poly raster against the true raster. Runs an optimized version of the usgs grading metric for polygons. The score reurned is the same as the USGS metric.
 
 </details>
 
