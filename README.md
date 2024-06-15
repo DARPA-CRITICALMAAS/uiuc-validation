@@ -100,4 +100,4 @@ Example of a validation image from a UIUC model run on AR_StJoe_Mbs_poly
     Flag to enable the saving of debugging feedback images.
 
 ## Authors and acknowledgment
-This repo was created by and is maintained by the UIUC team.
+This repository is maintained by the UIUC team.
