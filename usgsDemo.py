@@ -163,10 +163,17 @@ def main(args):
             results_df.loc[len(results_df)] = result.result()
     log.info(f'Finished grading {len(results)} files')
 
-    csv_path = os.path.join(args.output, 'usgsDemo_results.csv')
-    results_df.to_csv(csv_path)
     if len(skipped_files) > 0:
         log.warning(f'Skipped grading on {len(skipped_files)} files. Could not find the necessary files for the following: {skipped_files}')
+        # Add skipped files last
+        for filepath in skipped_files:
+            map_name = [m for m in potential_map_names if m.replace(' ', '_') in filepath][0]
+            feature_name = os.path.basename(os.path.splitext(filepath)[0])
+            results_df.loc[len(results_df)] = {'Map' : map_name, 'Feature' : feature_name}
+
+    csv_path = os.path.join(args.output, 'usgsDemo_results.csv')
+    results_df.to_csv(csv_path)
+    
     log.info(f'Finished grading, saving results to {csv_path}, Runtime was {time()-main_time} seconds')
     
 
