@@ -93,6 +93,10 @@ def parse_command_line():
                         type=int,
                         default=4,
                         help='The range of color variation to consider for the legend color. Defaults to 4')
+    optional_args.add_argument('--processes',
+                        type=int,
+                        default=8,
+                        help='Number of parallel processes to run. Defaults to 8')
     optional_args.add_argument('--log',
                         default='logs/Latest.log',
                         help='Option to set the file logging will output to. Defaults to "logs/Latest.log"')
@@ -107,6 +111,11 @@ def parse_command_line():
     args.pred_segmentations = post_parse_data(args.pred_segmentations)
     return args
 
+def f_score_wrapper(map_name, feature_name, map_image_path, predicted_raster_path, true_raster_path, legend_json_path=None, min_valid_range=.1, difficult_weight=.7, set_false_as='hard', color_range=4, parallel_workers=4):
+    """Small wrapper to attch map and feature name to the result dict"""
+    result = feature_f_score(map_image_path, predicted_raster_path, true_raster_path, legend_json_path, min_valid_range, difficult_weight, set_false_as, color_range)
+    return {'Map' : map_name, 'Feature' : feature_name, 'F1 Score' : result['f_score'], 'Precision' : result['precision'], 'Recall' : result['recall']}
+
 def main(args):
     main_time = time()
     global log
@@ -115,32 +124,56 @@ def main(args):
     # Create output directory if it does not exist
     if not os.path.exists(args.output):
         os.makedirs(args.output)
-    
+
     results_df = pd.DataFrame(columns=['Map', 'Feature', 'F1 Score', 'Precision', 'Recall'])
 
     log.info(f'Running USGS Grading Metric on {len(args.pred_segmentations)} files')
+    
+    # Build arg list for multiprocessing
     skipped_files = []
     potential_map_names = [os.path.splitext(m)[0] for m in os.listdir(args.map_images) if m.endswith('.tif')]
+    f_score_args = []
     for pred_filepath in args.pred_segmentations:
+        # filepaths
         map_name = [m for m in potential_map_names if m.replace(' ', '_') in pred_filepath][0]
         feature_name = os.path.basename(os.path.splitext(pred_filepath)[0])
         map_filepath = os.path.join(args.map_images, map_name + '.tif')
         true_filepath = os.path.join(args.true_segmentations, os.path.basename(pred_filepath))
         json_filepath = os.path.join(args.legends, map_name + '.json')
 
+        # Check filepaths are valid
         missing_files = [label for label, f in {'true segmentation' : true_filepath, 'map image' : map_filepath, 'legend json' : json_filepath}.items() if not os.path.exists(f)] 
         if len(missing_files) > 0:
             log.warning(f'Could not find the necessary files for {os.path.basename(pred_filepath)}, missing {missing_files} skipping grading')
             skipped_files.append(pred_filepath)
             continue
 
-        result = feature_f_score(map_filepath, pred_filepath, true_filepath, legend_json_path=json_filepath, min_valid_range=args.min_valid_range, difficult_weight=args.difficult_weight, set_false_as=args.set_false_as, color_range=args.color_range)
-        results_df.loc[len(results_df)] = {'Map' : map_name, 'Feature' : feature_name, 'F1 Score' : result['f_score'], 'Precision' : result['precision'], 'Recall' : result['recall']}
+        f_score_args.append((map_name, feature_name, map_filepath, pred_filepath, true_filepath, json_filepath, args.min_valid_range, args.difficult_weight, args.set_false_as, args.color_range))
+    
+    # Actually run the f_Scoregrading in parallel
+    log.info(f'Starting grading on {len(f_score_args)} files')
+    results = []
+    from concurrent.futures import ThreadPoolExecutor
+    with ThreadPoolExecutor(max_workers=args.processes) as p:
+        # results = list(p.map(f_score_wrapper, tqdm(f_score_args, total=len(f_score_args)))
+        for f_args in f_score_args:
+            results.append(p.submit(f_score_wrapper, *f_args))
+
+        for result in results:
+            results_df.loc[len(results_df)] = result.result()
+    log.info(f'Finished grading {len(results)} files')
+
+    if len(skipped_files) > 0:
+        log.warning(f'Skipped grading on {len(skipped_files)} files. Could not find the necessary files for the following: {skipped_files}')
+        # Add skipped files last
+        for filepath in skipped_files:
+            map_name = [m for m in potential_map_names if m.replace(' ', '_') in filepath][0]
+            feature_name = os.path.basename(os.path.splitext(filepath)[0])
+            results_df.loc[len(results_df)] = {'Map' : map_name, 'Feature' : feature_name}
 
     csv_path = os.path.join(args.output, 'usgsDemo_results.csv')
     results_df.to_csv(csv_path)
-    if len(skipped_files) > 0:
-        log.warning(f'Skipped grading on {len(skipped_files)} files. Could not find the necessary files for the following: {skipped_files}')
+    
     log.info(f'Finished grading, saving results to {csv_path}, Runtime was {time()-main_time} seconds')
     
 
