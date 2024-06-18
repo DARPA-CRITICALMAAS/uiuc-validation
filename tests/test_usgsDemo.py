@@ -50,7 +50,8 @@ class Test_usgsDemo:
             min_valid_range=5,
             difficult_weight=0.7,
             set_false_as='hard',
-            color_range=4)
+            color_range=4,
+            processes=1)
         expected_csv_path = 'tests/data/mock_map_results.csv'
 
         self.run_test_usgsDemo(args, expected_csv_path, log)
